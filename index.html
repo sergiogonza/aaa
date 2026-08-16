@@ -1,43 +1,16 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#eee9df">
-<title>Intervalo — Causa indeterminada</title>
-<style>
-:root{--paper:#eee9df;--ink:#191816;--soft:#777169;--line:#c9c2b7;--white:#f8f5ef;--max:760px}*{box-sizing:border-box}html{background:var(--paper);color:var(--ink)}body{margin:0;font-family:Georgia,'Times New Roman',serif;min-height:100vh}.wrap{width:min(calc(100% - 38px),var(--max));margin:auto;min-height:100vh;display:flex;flex-direction:column}.top{height:86px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);font:11px/1.2 Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase}.top b{font-size:12px}.stage{flex:1;padding:10vh 0 7vh}.scene{animation:appear .55s ease both}.kicker{font:10px/1.4 Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--soft);margin-bottom:35px}.number{font-size:clamp(62px,16vw,128px);line-height:.8;font-weight:400;margin:0 0 30px}.title{font-size:clamp(29px,6vw,52px);font-weight:400;line-height:1.04;margin:0 0 28px;letter-spacing:-.025em}.copy{font-size:clamp(19px,3vw,25px);line-height:1.5;max-width:650px}.copy p{margin:0 0 1.15em}.a{padding-left:22px;border-left:1px solid var(--ink)}.quiet{color:var(--soft)}.choices{display:flex;flex-wrap:wrap;gap:9px;margin-top:34px}button{font:11px Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);background:transparent;border:1px solid var(--line);padding:12px 15px;cursor:pointer}button:hover,button:focus{background:var(--ink);color:var(--paper);outline:none}.command{border-top:1px solid var(--line);padding:15px 0 18px;display:flex;gap:12px;align-items:center;font-family:Georgia,serif}.command span{font-size:21px}.command input{min-width:0;flex:1;border:0;background:transparent;color:var(--ink);font:18px Georgia,serif;outline:none}.command button{border:0;padding:7px}.foot{display:flex;justify-content:space-between;padding:0 0 18px;font:10px Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}.foot button{border:0;padding:0;color:inherit}.rule{height:1px;background:var(--line);margin:35px 0}.record{font:13px/1.8 'Courier New',monospace;white-space:pre-wrap;background:rgba(255,255,255,.22);padding:22px;border:1px solid var(--line)}.timer{font:48px/1 Georgia,serif;margin:35px 0}.vector{font-size:72px;letter-spacing:.25em}.notice{font-style:italic;color:var(--soft);font-size:16px;margin-top:30px}dialog{width:min(90vw,700px);border:1px solid var(--line);background:var(--white);color:var(--ink);padding:0}dialog::backdrop{background:rgba(25,24,22,.45)}.paper{padding:28px}.dialog-head{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:20px;font:11px Arial,sans-serif;letter-spacing:.15em}.dialog-head button{border:0;padding:0}.paper pre{white-space:pre-wrap;font:13px/1.7 'Courier New',monospace}@keyframes appear{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}@media(max-width:560px){.stage{padding-top:7vh}.top{height:68px}.copy{font-size:19px}.command input{font-size:16px}}
-</style>
-</head><body><main class="wrap"><header class="top"><b>Intervalo</b><span id="folio">001 / causa indeterminada</span></header><section id="stage" class="stage"></section><form id="command" class="command"><span>›</span><input id="input" autocomplete="off" placeholder="escribe algo"><button>enviar</button></form><footer class="foot"><button id="archive">archivo</button><button id="restart">reiniciar</button></footer></main><dialog id="modal"><div class="paper"><div class="dialog-head"><b>Archivo local</b><button id="close">cerrar</button></div><pre id="record"></pre></div></dialog>
-<script>
-const $=s=>document.querySelector(s),stage=$('#stage'),input=$('#input');
-let S=JSON.parse(localStorage.getItem('intervalo001')||'{"step":0,"answers":{},"started":null}');
-const save=()=>localStorage.setItem('intervalo001',JSON.stringify(S));
-const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-function view(html){stage.innerHTML='<div class="scene">'+html+'</div>';window.scrollTo({top:0,behavior:'smooth'});input.focus()}
-function choices(items){return '<div class="choices">'+items.map(x=>`<button type="button" data-go="${x[0]}">${x[1]}</button>`).join('')+'</div>'}
-function go(n){S.step=n;save();render()}
-function answer(key,val,next){S.answers[key]=val;go(next)}
-const A=t=>`<div class="copy a">${t}</div>`;
-function render(){
- const a=S.answers;
- switch(S.step){
- case 0:view(`<div class="kicker">archivo / fragmento 001</div><div class="number">158</div><div class="copy"><p>aves.</p><p>Una ciudad colombiana.<br>Una mañana cualquiera.</p><p class="quiet">Se investigaron causas. Algunas fueron descartadas. La respuesta definitiva no llegó con la misma rapidez que la noticia.</p></div>${choices([[1,'continuar']])}`);break;
- case 1:view(A(`<p>Me gusta la expresión <em>causa indeterminada</em>.</p><p>Suena bastante mejor que “no sabemos”.</p><p>Aunque supongo que hay días en los que no saber es la descripción más exacta disponible.</p><p>Lo extraño no es que ocurra algo sin explicación inmediata.</p><p>Lo extraño es que después haya que almorzar.</p>`)+choices([[2,'continuar']]));break;
- case 2:view(`<div class="kicker">misión 001</div><h1 class="title">Causa indeterminada</h1>${A(`<p>Sal.</p><p>Encuentra algo que haya caído y que nadie esté intentando recoger.</p><p class="quiet">No personas. No animales. No entres a propiedad privada ni te acerques al tráfico. Una hoja, un papel, una flor, una rama sirven.</p><p>Cuando lo encuentres, dime qué es.</p>`)}`);break;
- case 3:view(A(`<p>“${esc(a.fallen)}”.</p><p>Bien.</p><p>No lo recojas.</p><p>Ahora busca algo que parezca llevar mucho tiempo en su sitio.</p><p>Un árbol. Un muro. Una escalera. Un edificio. Algo que no parezca tener prisa.</p><p>Cuando lo encuentres, descríbelo.</p>`));break;
- case 4:view(`<div class="kicker">registro provisional</div><div class="record">OBJETO A   ${esc(a.fallen||'—')}\nESTADO     CAÍDO\n\nOBJETO B   ${esc(a.standing||'—')}\nESTADO     PERMANECE</div>${A(`<p style="margin-top:35px">Dos cosas.</p><p>Una dejó su lugar. La otra sigue ahí.</p><p>No significa nada todavía.</p><p>Procuremos no arruinarlo demasiado pronto.</p>`)+choices([[5,'seguir']])}`);break;
- case 5:view(A(`<p>Camina unos minutos por una ruta pública que ya conozcas.</p><p>No busques nada especial.</p><p>Si ves algo que normalmente ignorarías, escríbelo.</p><p>También puedes escribir <em>llegué</em> cuando quieras detenerte.</p>`));break;
- case 6:view(A(`<p>“${esc(a.observed)}”.</p><p>Archivado.</p><p>Ahora quédate donde estés, siempre que sea un lugar público y seguro.</p><p>Durante un momento no hagas nada para esta misión.</p>`)+`<div class="timer">03:00</div>`+choices([[7,'empezar']])}`);break;
- case 7:startWait();break;
- case 8:view(A(`<p>¿Qué pasó mientras esperabas?</p>`)+choices([[9,'alguien pasó'],[10,'algo cambió'],[11,'nada'],[12,'no presté atención']]));break;
- case 9:case 10:case 11:case 12:{let x={9:'alguien pasó',10:'algo cambió',11:'nada',12:'no presté atención'}[S.step];S.answers.wait=x;S.step=13;save();render();break}
- case 13:view(A(`<p>${a.wait==='nada'?'Tres minutos y ningún acontecimiento digno de archivo. Qué lujo.':'Eso bastará.'}</p><p>Una cosa ocurre. Después otra.</p><p>Si ocurren suficientemente cerca, inventamos una relación: causa, suerte, culpa, destino.</p><p>Necesitamos patrones para orientarnos. El problema empieza cuando confundimos el patrón con el mundo.</p><p>Una vida hecha solo de acontecimientos sin relación sería difícil de soportar.</p><p>Una vida en la que todo significara algo quizá sería peor.</p>`)+choices([[14,'continuar']]));break;
- case 14:view(A(`<p>Última parte.</p><p>Piensa en alguien que probablemente esté teniendo un día completamente ordinario.</p><p>No necesito saber quién.</p><p>Si quieres, escríbele algo sencillo. No porque el sistema crea que va a cambiar la historia.</p><p>Precisamente porque probablemente no la cambie.</p>`)+choices([[15,'hecho'],[16,'prefiero no hacerlo']]));break;
- case 15:case 16:S.answers.contact=S.step===15?'hecho':'omitido';S.step=17;save();render();break;
- case 17:view(`<div class="kicker">misión completa</div><div class="vector">↓ │ →</div><div class="rule"></div><div class="record">CAUSA       INDETERMINADA\nCAÍDO       ${esc(a.fallen||'—')}\nPERMANECE   ${esc(a.standing||'—')}\nOBSERVADO   ${esc(a.observed||'—')}\nESPERA      ${esc(a.wait||'—')}\nCONTACTO    ${esc(a.contact||'—')}\nCONCLUSIÓN  NINGUNA</div>${A(`<p style="margin-top:35px">Intenté encontrar una conclusión.</p><p>No encontré ninguna.</p><p class="quiet">Parece suficiente para un día.</p>`)}`);break;
- }}
-function startWait(){view(`<div class="kicker">intervalo</div><h1 class="title">Mira alrededor.</h1><div class="copy"><p>No hace falta mirar esta pantalla.</p><p class="quiet">Cuando hayan pasado tres minutos, te avisaré aquí.</p></div>`);setTimeout(()=>go(8),180000)}
-$('#command').addEventListener('submit',e=>{e.preventDefault();let v=input.value.trim();if(!v)return;input.value='';let q=v.toLowerCase();if(q==='archivo'){openArchive();return}if(q==='salir'){view(A('<p>Puedes cerrar la página. El recorrido queda guardado en este dispositivo.</p>'));return}if(S.step===2)answer('fallen',v,3);else if(S.step===3)answer('standing',v,4);else if(S.step===5){if(q==='llegué'||q==='llegue')answer('observed','sin registro',6);else answer('observed',v,6)}else view(A(`<p>Te leí.</p><p>“${esc(v)}”</p><p class="quiet">No tengo una respuesta útil para eso todavía.</p>`)+choices([[S.step,'volver']]))});
-stage.addEventListener('click',e=>{let b=e.target.closest('[data-go]');if(b)go(+b.dataset.go)});
-function openArchive(){let a=S.answers;$('#record').textContent=`INTERVALO / 001\n\nESTADO      ${S.step===17?'COMPLETA':'EN CURSO'}\nCAÍDO       ${a.fallen||'—'}\nPERMANECE   ${a.standing||'—'}\nOBSERVADO   ${a.observed||'—'}\nESPERA      ${a.wait||'—'}\nCONTACTO    ${a.contact||'—'}\n\nLos datos de esta misión permanecen en este navegador.`;$('#modal').showModal()}
-$('#archive').onclick=openArchive;$('#close').onclick=()=>$('#modal').close();$('#restart').onclick=()=>{if(confirm('¿Reiniciar esta misión?')){localStorage.removeItem('intervalo001');S={step:0,answers:{},started:null};render()}};render();
-</script></body></html>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#ece7dc">
+  <meta name="description" content="INTERVALO — ficción de observación, recorrido y memoria.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css">
+  <title>INTERVALO</title>
+</head>
+<body>
+  <noscript>INTERVALO necesita JavaScript para conservar el recorrido en este dispositivo.</noscript>
+  <script src="app.js"></script>
+</body>
+</html>
