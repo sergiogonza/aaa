@@ -51,7 +51,7 @@ function showDesktop(){
  document.body.innerHTML=`<main class="desktop"><header class="topbar"><div class="brand">Intervalo</div><div class="top-meta"><span>la ciudad no cabe en esta pantalla</span><span id="clock"></span></div></header><section id="workspace" class="workspace"></section><nav class="dock"><button data-app="story">relato</button><button data-app="archive">archivo</button><button data-app="map">recorrido</button><button data-app="about">nota</button><button id="installDock">instalar</button></nav></main><dialog id="memoDialog"><div class="dialog"><div class="dialog-head"><strong id="memoTitle">memo</strong><button onclick="this.closest('dialog').close()">cerrar</button></div><div id="memoBody"></div></div></dialog>`;
  const tick=()=>{$('#clock').textContent=new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})};tick();setInterval(tick,30000);
  $$('.dock [data-app]').forEach(b=>b.onclick=()=>openApp(b.dataset.app));$('#installDock').onclick=installPWA;
- openApp('story');
+ // Important: no app is opened automatically. The player decides when to launch RELATO/MISIONES.
 }
 function makeWindow(id,title,body,x=55,y=45,w=610){
  let old=$('#win-'+id);if(old){old.classList.remove('min');old.style.zIndex=++z;return old}
