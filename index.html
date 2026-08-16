@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1">
+
+<title>CUBE // 26³ Dynamic Simulator</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:#050505;
+    color:#ddd;
+    font-family:Arial,Helvetica,sans-serif;
+    overflow:hidden;
+}
+
+header{
+    height:70px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 24px;
+    border-bottom:1px solid #222;
+    background:#090909;
+}
+
+.logo{
+    font-size:20px;
+    letter-spacing:5px;
+}
+
+.status{
+    font-size:11px;
+    color:#888;
+    letter-spacing:2px;
+}
+
+.dashboard{
+    height:calc(100vh - 70px);
+    display:grid;
+    grid-template-columns:280px 1fr 300px;
+    gap:1px;
+    background:#222;
+}
+
+.panel{
+    background:#080808;
+    padding:18px;
+    overflow:auto;
+}
+
+.center{
+    position:relative;
+    background:#030303;
+}
+
+h3{
+    font-size:11px;
+    letter-spacing:3px;
+    color:#777;
+    margin:0 0 14px;
+}
+
+.value{
+    font-size:28px;
+    font-weight:bold;
+    letter-spacing:2px;
+}
+
+.coord{
+    font-family:monospace;
+    font-size:24px;
+    margin:10px 0 20px;
+}
+
+.row{
+    display:flex;
+    justify-content:space-between;
+    padding:9px 0;
+    border-bottom:1px solid #181818;
+    font-size:12px;
+}
+
+button{
+    width:100%;
+    margin-top:8px;
+    padding:12px;
+    background:#111;
+    color:#ddd;
+    border:1px solid #333;
+    cursor:pointer;
+    letter-spacing:2px;
+}
+
+button:hover{
+    background:#222;
+}
+
+canvas{
+    width:100%;
+    height:100%;
+    display:block;
+}
+
+.legend{
+    margin-top:20px;
+    font-size:11px;
+    line-height:1.8;
+}
+
+.dot{
+    display:inline-block;
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    margin-right:7px;
+}
+
+.normal{background:#777;}
+.path{background:#fff;}
+.current{background:#00ffcc;}
+.bridge{background:#ffd000;}
+.danger{background:#ff304f;}
+
+#log{
+    max-height:45vh;
+    overflow:auto;
+    font-family:monospace;
+    font-size:10px;
+    line-height:1.7;
+}
+
+.logItem{
+    border-bottom:1px solid #161616;
+    padding:5px 0;
+}
+
+.bridgeBox{
+    margin-top:20px;
+    padding:15px;
+    border:1px solid #333;
+}
+
+.bridgeFound{
+    color:#ffd000;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+CUBE // 26³
+</div>
+
+<div class="status">
+DYNAMIC 3D ROOM GRAPH
+</div>
+
+</header>
+
+<div class="dashboard">
+
+<!-- LEFT -->
+
+<section class="panel">
+
+<h3>SPACE</h3>
+
+<div class="value">26³</div>
+
+<div class="coord" id="coord">
+(1,1,1)
+</div>
+
+<div class="row">
+<span>ROOMS</span>
+<span>17,576</span>
+</div>
+
+<div class="row">
+<span>X</span>
+<span id="x">1</span>
+</div>
+
+<div class="row">
+<span>Y</span>
+<span id="y">1</span>
+</div>
+
+<div class="row">
+<span>Z</span>
+<span id="z">1</span>
+</div>
+
+<div class="row">
+<span>STEP</span>
+<span id="step">0</span>
+</div>
+
+<div class="row">
+<span>STATE</span>
+<span id="state">NORMAL</span>
+</div>
+
+<br>
+
+<h3>CODE</h3>
+
+<input
+ id="codeInput"
+ value="517 478 565"
+ style="
+ width:100%;
+ background:#111;
+ color:#ddd;
+ border:1px solid #333;
+ padding:12px;
+ font-family:monospace;
+">
+
+<button onclick="loadCode()">
+LOAD CODE
+</button>
+
+<button onclick="moveRandom()">
+NEXT ROOM
+</button>
+
+<button onclick="permute()">
+PERMUTE CUBE
+</button>
+
+<button onclick="findBridge()">
+SEARCH BRIDGE
+</button>
+
+<button onclick="resetSimulation()">
+RESET
+</button>
+
+<div class="legend">
+
+<p>
+<span class="dot current"></span>
+CURRENT
+</p>
+
+<p>
+<span class="dot path"></span>
+PATH
+</p>
+
+<p>
+<span class="dot bridge"></span>
+BRIDGE
+</p>
+
+<p>
+<span class="dot danger"></span>
+DANGER
+</p>
+
+</div>
+
+</section>
+
+
+<!-- CENTER -->
+
+<section class="center">
+
+<canvas id="cubeCanvas"></canvas>
+
+</section>
+
+
+<!-- RIGHT -->
+
+<section class="panel">
+
+<h3>ROOM HISTORY</h3>
+
+<div id="log"></div>
+
+<div class="bridgeBox">
+
+<h3>GEOMETRY</h3>
+
+<div class="row">
+<span>INTERIOR</span>
+<span>26³</span>
+</div>
+
+<div class="row">
+<span>EDGE</span>
+<span id="edge">NO</span>
+</div>
+
+<div class="row">
+<span>BRIDGE</span>
+<span id="bridge">NO</span>
+</div>
+
+<div class="row">
+<span>OUTER SHELL</span>
+<span id="shell">NO</span>
+</div>
+
+</div>
+
+</section>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   CUBE MODEL
+===================================================== */
+
+const N = 26;
+
+let current = {
+    x:1,
+    y:1,
+    z:1
+};
+
+let path = [];
+
+let step = 0;
+
+let rooms = new Map();
+
+
+/* =====================================================
+   ROOM ID
+===================================================== */
+
+function roomID(x,y,z){
+
+    return `${x},${y},${z}`;
+
+}
+
+
+/* =====================================================
+   CREATE ROOM
+===================================================== */
+
+function getRoom(x,y,z){
+
+    const id = roomID(x,y,z);
+
+    if(!rooms.has(id)){
+
+        rooms.set(id,{
+
+            x,
+            y,
+            z,
+
+            trap:false,
+            bridge:false,
+
+            permutation:0
+
+        });
+
+    }
+
+    return rooms.get(id);
+
+}
+
+
+/* =====================================================
+   BOUNDARY
+===================================================== */
+
+function isEdge(r){
+
+    return (
+        r.x === 1 ||
+        r.x === N ||
+        r.y === 1 ||
+        r.y === N ||
+        r.z === 1 ||
+        r.z === N
+    );
+
+}
+
+
+/* =====================================================
+   BRIDGE MODEL
+===================================================== */
+
+/*
+
+The movie/storyboard concept is represented here
+as a SPECIAL EDGE STATE.
+
+It is NOT claimed to be the exact film algorithm.
+
+*/
+
+function isBridge(r){
+
+    return (
+
+        isEdge(r) &&
+
+        (
+            (r.x === 1 && r.y === 13) ||
+            (r.x === 26 && r.y === 13) ||
+            (r.y === 1 && r.z === 13) ||
+            (r.y === 26 && r.z === 13) ||
+            (r.z === 1 && r.x === 13) ||
+            (r.z === 26 && r.x === 13)
+        )
+
+    );
+
+}
+
+
+/* =====================================================
+   TRAP MODEL
+===================================================== */
+
+/*
+
+Simplified experimental model.
+
+The actual movie does not provide a complete
+computational trap-generation formula.
+
+*/
+
+function isTrap(r){
+
+    const value =
+        r.x * 17 +
+        r.y * 31 +
+        r.z * 43;
+
+    return value % 17 === 0;
+
+}
+
+
+/* =====================================================
+   UPDATE ROOM
+===================================================== */
+
+function evaluateRoom(){
+
+    const r = getRoom(
+        current.x,
+        current.y,
+        current.z
+    );
+
+    r.trap = isTrap(r);
+
+    r.bridge = isBridge(r);
+
+    updateHUD();
+
+}
+
+
+/* =====================================================
+   MOVE
+===================================================== */
+
+function move(dx,dy,dz){
+
+    const nx =
+        Math.max(
+            1,
+            Math.min(N,current.x + dx)
+        );
+
+    const ny =
+        Math.max(
+            1,
+            Math.min(N,current.y + dy)
+        );
+
+    const nz =
+        Math.max(
+            1,
+            Math.min(N,current.z + dz)
+        );
+
+    current.x = nx;
+    current.y = ny;
+    current.z = nz;
+
+    step++;
+
+    path.push({
+        x:nx,
+        y:ny,
+        z:nz
+    });
+
+    evaluateRoom();
+
+    addLog();
+
+    draw();
+
+}
+
+
+/* =====================================================
+   RANDOM MOVE
+===================================================== */
+
+function moveRandom(){
+
+    const moves = [
+
+        [1,0,0],
+        [-1,0,0],
+
+        [0,1,0],
+        [0,-1,0],
+
+        [0,0,1],
+        [0,0,-1]
+
+    ];
+
+    const m =
+        moves[
+            Math.floor(
+                Math.random()*moves.length
+            )
+        ];
+
+    move(
+        m[0],
+        m[1],
+        m[2]
+    );
+
+}
+
+
+/* =====================================================
+   PERMUTATION
+===================================================== */
+
+function permute(){
+
+    /* Experimental room permutation */
+
+    path = [];
+
+    const old = {...current};
+
+    current = {
+
+        x:
+            ((old.y * 7 +
+              old.z * 11) % N) + 1,
+
+        y:
+            ((old.z * 13 +
+              old.x * 5) % N) + 1,
+
+        z:
+            ((old.x * 17 +
+              old.y * 3) % N) + 1
+
+    };
+
+    step++;
+
+    path.push({...current});
+
+    evaluateRoom();
+
+    addLog("PERMUTATION");
+
+    draw();
+
+}
+
+
+/* =====================================================
+   CODE
+===================================================== */
+
+function loadCode(){
+
+    const input =
+        document
+        .getElementById("codeInput")
+        .value
+        .trim();
+
+    const nums =
+        input
+        .split(/\s+/)
+        .map(Number);
+
+    if(nums.length !== 3){
+
+        alert(
+            "Introduce tres números, por ejemplo: 517 478 565"
+        );
+
+        return;
+
+    }
+
+    /*
+       IMPORTANT:
+
+       The movie codes are not directly
+       1..26 coordinates.
+
+       We therefore create a deterministic
+       projection into the 26³ experimental model.
+    */
+
+    current = {
+
+        x:(nums[0] % N) || N,
+
+        y:(nums[1] % N) || N,
+
+        z:(nums[2] % N) || N
+
+    };
+
+    step++;
+
+    path.push({...current});
+
+    evaluateRoom();
+
+    addLog("CODE");
+
+    draw();
+
+}
+
+
+/* =====================================================
+   BRIDGE SEARCH
+===================================================== */
+
+function findBridge(){
+
+    /*
+       Search every boundary cell for our
+       experimental bridge condition.
+    */
+
+    for(let x=1;x<=N;x++){
+
+        for(let y=1;y<=N;y++){
+
+            for(let z=1;z<=N;z++){
+
+                const r =
+                    getRoom(x,y,z);
+
+                if(isBridge(r)){
+
+                    r.bridge = true;
+
+                }
+
+            }
+
+        }
+
+    }
+
+    addLog(
+        "BRIDGE STATES GENERATED"
+    );
+
+    draw();
+
+}
+
+
+/* =====================================================
+   RESET
+===================================================== */
+
+function resetSimulation(){
+
+    current = {
+        x:1,
+        y:1,
+        z:1
+    };
+
+    path = [];
+
+    step = 0;
+
+    rooms.clear();
+
+    document
+        .getElementById("log")
+        .innerHTML = "";
+
+    evaluateRoom();
+
+    draw();
+
+}
+
+
+/* =====================================================
+   HUD
+===================================================== */
+
+function updateHUD(){
+
+    const r =
+        getRoom(
+            current.x,
+            current.y,
+            current.z
+        );
+
+    document
+        .getElementById("coord")
+        .textContent =
+        `(${current.x},${current.y},${current.z})`;
+
+    document
+        .getElementById("x")
+        .textContent =
+        current.x;
+
+    document
+        .getElementById("y")
+        .textContent =
+        current.y;
+
+    document
+        .getElementById("z")
+        .textContent =
+        current.z;
+
+    document
+        .getElementById("step")
+        .textContent =
+        step;
+
+    let state = "NORMAL";
+
+    if(r.trap)
+        state = "DANGER";
+
+    if(isEdge(r))
+        state = "EDGE";
+
+    if(r.bridge)
+        state = "BRIDGE";
+
+    document
+        .getElementById("state")
+        .textContent =
+        state;
+
+    document
+        .getElementById("edge")
+        .textContent =
+        isEdge(r) ? "YES" : "NO";
+
+    document
+        .getElementById("bridge")
+        .textContent =
+        r.bridge ? "YES" : "NO";
+
+    document
+        .getElementById("shell")
+        .textContent =
+        isEdge(r) ? "NEAR" : "NO";
+
+}
+
+
+/* =====================================================
+   LOG
+===================================================== */
+
+function addLog(type="MOVE"){
+
+    const div =
+        document.createElement("div");
+
+    div.className =
+        "logItem";
+
+    div.textContent =
+
+        `${String(step).padStart(3,"0")}  ` +
+
+        `${current.x},` +
+        `${current.y},` +
+        `${current.z}` +
+
+        `  [${type}]`;
+
+    const log =
+        document.getElementById("log");
+
+    log.prepend(div);
+
+}
+
+
+/* =====================================================
+   CANVAS
+===================================================== */
+
+const canvas =
+    document.getElementById("cubeCanvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+
+function resize(){
+
+    canvas.width =
+        canvas.clientWidth *
+        devicePixelRatio;
+
+    canvas.height =
+        canvas.clientHeight *
+        devicePixelRatio;
+
+    ctx.setTransform(
+        devicePixelRatio,
+        0,
+        0,
+        devicePixelRatio,
+        0,
+        0
+    );
+
+    draw();
+
+}
+
+
+window.addEventListener(
+    "resize",
+    resize
+);
+
+
+/* =====================================================
+   3D PROJECTION
+===================================================== */
+
+function project(x,y,z){
+
+    const w =
+        canvas.clientWidth;
+
+    const h =
+        canvas.clientHeight;
+
+    const scale =
+        Math.min(w,h) * 0.55;
+
+    const cx =
+        w/2;
+
+    const cy =
+        h/2;
+
+    const X =
+        (x-N/2) / N;
+
+    const Y =
+        (y-N/2) / N;
+
+    const Z =
+        (z-N/2) / N;
+
+    return {
+
+        x:
+            cx +
+            (X-Y)*scale,
+
+        y:
+            cy +
+            (X+Y)*scale*0.5 -
+            Z*scale
+
+    };
+
+}
+
+
+/* =====================================================
+   DRAW
+===================================================== */
+
+function draw(){
+
+    const w =
+        canvas.clientWidth;
+
+    const h =
+        canvas.clientHeight;
+
+    ctx.clearRect(
+        0,0,w,h
+    );
+
+
+    /* background */
+
+    ctx.fillStyle =
+        "#030303";
+
+    ctx.fillRect(
+        0,0,w,h
+    );
+
+
+    /* cube edges */
+
+    const corners = [
+
+        [1,1,1],
+        [N,1,1],
+        [1,N,1],
+        [N,N,1],
+
+        [1,1,N],
+        [N,1,N],
+        [1,N,N],
+        [N,N,N]
+
+    ];
+
+
+    const lines = [
+
+        [0,1],[0,2],[1,3],[2,3],
+
+        [4,5],[4,6],[5,7],[6,7],
+
+        [0,4],[1,5],[2,6],[3,7]
+
+    ];
+
+
+    ctx.strokeStyle =
+        "#333";
+
+    ctx.lineWidth = 1;
+
+
+    lines.forEach(
+        ([a,b])=>{
+
+            const p1 =
+                project(...corners[a]);
+
+            const p2 =
+                project(...corners[b]);
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                p1.x,p1.y
+            );
+
+            ctx.lineTo(
+                p2.x,p2.y
+            );
+
+            ctx.stroke();
+
+        }
+    );
+
+
+    /* grid */
+
+    ctx.strokeStyle =
+        "#151515";
+
+    for(let i=1;i<=N;i+=5){
+
+        let a =
+            project(i,1,1);
+
+        let b =
+            project(i,N,1);
+
+        ctx.beginPath();
+
+        ctx.moveTo(a.x,a.y);
+
+        ctx.lineTo(b.x,b.y);
+
+        ctx.stroke();
+
+
+        let c =
+            project(1,i,1);
+
+        let d =
+            project(N,i,1);
+
+        ctx.beginPath();
+
+        ctx.moveTo(c.x,c.y);
+
+        ctx.lineTo(d.x,d.y);
+
+        ctx.stroke();
+
+    }
+
+
+    /* PATH */
+
+    if(path.length>1){
+
+        ctx.strokeStyle =
+            "#ffffff";
+
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+
+
+        path.forEach(
+            (p,i)=>{
+
+                const q =
+                    project(
+                        p.x,
+                        p.y,
+                        p.z
+                    );
+
+                if(i===0)
+
+                    ctx.moveTo(
+                        q.x,q.y
+                    );
+
+                else
+
+                    ctx.lineTo(
+                        q.x,q.y
+                    );
+
+            }
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    /* visited points */
+
+    path.forEach(
+        p=>{
+
+            const q =
+                project(
+                    p.x,
+                    p.y,
+                    p.z
+                );
+
+            ctx.fillStyle =
+                "#777";
+
+            ctx.beginPath();
+
+            ctx.arc(
+                q.x,
+                q.y,
+                3,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fill();
+
+        }
+    );
+
+
+    /* current */
+
+    const q =
+        project(
+            current.x,
+            current.y,
+            current.z
+        );
+
+    ctx.fillStyle =
+        "#00ffcc";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        q.x,
+        q.y,
+        8,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* coordinate label */
+
+    ctx.fillStyle =
+        "#aaa";
+
+    ctx.font =
+        "12px monospace";
+
+    ctx.fillText(
+        `(${current.x},${current.y},${current.z})`,
+        q.x+12,
+        q.y-12
+    );
+
+
+}
+
+
+/* =====================================================
+   KEYBOARD
+===================================================== */
+
+document.addEventListener(
+    "keydown",
+    e=>{
+
+        if(e.key==="ArrowRight")
+            move(1,0,0);
+
+        if(e.key==="ArrowLeft")
+            move(-1,0,0);
+
+        if(e.key==="ArrowUp")
+            move(0,1,0);
+
+        if(e.key==="ArrowDown")
+            move(0,-1,0);
+
+        if(e.key==="w")
+            move(0,0,1);
+
+        if(e.key==="s")
+            move(0,0,-1);
+
+    }
+);
+
+
+/* =====================================================
+   START
+===================================================== */
+
+path.push({...current});
+
+evaluateRoom();
+
+resize();
+
+</script>
+
+</body>
+</html>
