@@ -1,0 +1,11 @@
+{
+  "name":"Intervalo",
+  "short_name":"Intervalo",
+  "description":"Una ficción de observación, recorrido y memoria.",
+  "start_url":"./",
+  "display":"standalone",
+  "background_color":"#ece7dc",
+  "theme_color":"#ece7dc",
+  "lang":"es",
+  "orientation":"any"
+}
